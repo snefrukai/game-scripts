@@ -1,0 +1,280 @@
+{
+ "version": "v1.6.8",
+ "astrologyModifiers": [
+  {},
+  {
+   "increasedSkillXP": [
+    [
+     6,
+     0
+    ]
+   ],
+   "increasedHiddenSkillLevel": [
+    [
+     6,
+     0
+    ]
+   ],
+   "increasedGPFromMonsters": 0,
+   "increasedGlobalAccuracy": 0,
+   "increasedMinHitBasedOnMaxHit": 0
+  },
+  {},
+  {
+   "increasedSkillXP": [
+    [
+     7,
+     0
+    ]
+   ],
+   "increasedHiddenSkillLevel": [
+    [
+     7,
+     0
+    ]
+   ],
+   "increasedGPFromMonsters": 0,
+   "increasedGlobalAccuracy": 0,
+   "increasedMeleeStrengthBonus": 0
+  },
+  {
+   "increasedSkillXP": [
+    [
+     9,
+     0
+    ]
+   ],
+   "increasedGPFromMonsters": 0,
+   "increasedGlobalAccuracy": 0,
+   "increasedHitpointRegeneration": 0,
+   "increasedLifesteal": 0,
+   "increasedFoodHealingValue": 0,
+   "increasedChanceToPreserveFood": 0
+  },
+  {
+   "increasedSkillXP": [
+    [
+     12,
+     0
+    ]
+   ],
+   "increasedHiddenSkillLevel": [
+    [
+     12,
+     0
+    ]
+   ],
+   "increasedGPFromMonsters": 0,
+   "increasedGlobalAccuracy": 0,
+   "increasedRangedStrengthBonus": 0,
+   "increasedRangedAccuracyBonus": 0,
+   "increasedAmmoPreservation": 0
+  },
+  {
+   "increasedSkillXP": [
+    [
+     16,
+     0
+    ]
+   ],
+   "increasedHiddenSkillLevel": [
+    [
+     16,
+     0
+    ]
+   ],
+   "increasedGPFromMonsters": 0,
+   "increasedGlobalAccuracy": 0,
+   "increasedMagicDamageBonus": 0,
+   "increasedMagicAccuracyBonus": 0
+  },
+  {},
+  {
+   "increasedSkillXP": [
+    [
+     8,
+     0
+    ],
+    [
+     18,
+     0
+    ]
+   ],
+   "increasedHiddenSkillLevel": [
+    [
+     8,
+     0
+    ]
+   ],
+   "increasedGPFromMonsters": 0,
+   "increasedGlobalAccuracy": 0,
+   "increasedSlayerCoins": 0,
+   "increasedGlobalEvasion": 0,
+   "increasedReflectDamage": 0,
+   "increasedDamageToSlayerTasks": 0,
+   "increasedDamageToSlayerAreaMonsters": 0
+  },
+  {
+   "increasedSkillXP": [
+    [
+     17,
+     0
+    ]
+   ],
+   "increasedGPFromMonsters": 0,
+   "increasedGlobalAccuracy": 0,
+   "increasedChanceToPreservePrayerPoints": 0
+  },
+  {
+   "increasedSkillXP": [
+    [
+     21,
+     0
+    ]
+   ],
+   "increasedSummoningChargePreservation": 0,
+   "increasedChanceToPreservePotionCharge": 0
+  }
+ ],
+ "course": [
+  1,
+  4,
+  8,
+  11,
+  18,
+  24,
+  29,
+  47,
+  38,
+  42
+ ],
+ "courseMastery": {
+  "1": false,
+  "4": false,
+  "8": false,
+  "11": false,
+  "18": false,
+  "24": false,
+  "29": false,
+  "38": true,
+  "42": false,
+  "47": false
+ },
+ "equipment": [
+  718,
+  720,
+  719,
+  721,
+  814,
+  814,
+  819,
+  1086,
+  722,
+  1083,
+  818,
+  -1,
+  985,
+  990
+ ],
+ "levels": [
+  103,
+  104,
+  103,
+  104,
+  103,
+  108,
+  93,
+  87,
+  98,
+  100,
+  111,
+  118,
+  96,
+  114,
+  106,
+  99,
+  99,
+  102,
+  92,
+  112,
+  101,
+  111,
+  102
+ ],
+ "petUnlocked": [
+  true,
+  true,
+  false,
+  false,
+  true,
+  true,
+  true,
+  true,
+  true,
+  true,
+  true,
+  true,
+  false,
+  false,
+  true,
+  true,
+  true,
+  true,
+  true,
+  true,
+  true,
+  true,
+  false,
+  false,
+  false,
+  false,
+  false,
+  true,
+  true,
+  true,
+  true,
+  true,
+  false,
+  true,
+  true,
+  false,
+  true,
+  false,
+  false,
+  false,
+  false,
+  true,
+  false,
+  false,
+  true,
+  true,
+  false,
+  true,
+  true,
+  true
+ ],
+ "styles": {
+  "melee": "Block",
+  "ranged": "Rapid",
+  "magic": "Defensive"
+ },
+ "prayerSelected": [],
+ "ancient": -1,
+ "aurora": 5,
+ "autoEatTier": 2,
+ "cookingMastery": false,
+ "cookingPool": true,
+ "currentGamemode": 2,
+ "curse": 12,
+ "foodSelected": 32,
+ "healAfterDeath": true,
+ "isAncient": false,
+ "isManualEating": false,
+ "isSlayerTask": false,
+ "pillar": 0,
+ "potionID": 21,
+ "potionTier": 3,
+ "standard": 13,
+ "summoningSynergy": true,
+ "useCombinationRunes": false
+}

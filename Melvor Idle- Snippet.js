@@ -31,25 +31,27 @@
 
     snippet.name = 'upgrade.js'
     snippet.start()
+
+    // * start of copy code
+
     // auto upgrade selected item by item ID at set interval
 
     window.upgradeItem_repeat = function (itemID, fn, count, minute) {
-      // * start of copy to tampermonkey scrpit
-
       function upgradedItemID(itemID) {
         return items[itemID].trimmedItemID
       }
 
-      function upgrade(itemID, qty) {
-        confirmUpgradeItem(itemID, upgradedItemID(itemID), qty)
-      }
+      // function upgrade(itemID, qty) {
+      //   confirmUpgradeItem(itemID, upgradedItemID(itemID), qty)
+      // }
 
       // ! func name 'upgradeItemAll' could cause freeze in tampermonkley
       function upgradeAll(itemID) {
-        confirmUpgradeItemAll(itemID, upgradedItemID(itemID))
+        for (let k = 0; k < itemID.length; k++) {
+          confirmUpgradeItemAll(itemID[k], upgradedItemID(itemID[k]))
+          console.log('upgrading item ID', itemID[k])
+        }
       }
-
-      // repeat
 
       function repeat(itemID, fn = upgradeAll, count = 10000, minute = 5) {
         let i = 0
@@ -67,10 +69,18 @@
       }
 
       repeat(itemID)
-
-      // * end of copy to tampermonkey scrpit
     }
 
+    upgradeItem_repeat([
+      768, // air shard
+      769, // water ...
+      770, // earth ...
+      771, // fire ...
+      // 890, // mys stone
+      // 886, // mys stone charge
+    ])
+
+    // * end of copy code
     snippet.end()
 
     // ========================================================================== //
@@ -87,22 +97,22 @@
         hideNoGathering()
         console.log('No Gathering skills hidden.')
       }
-    }
 
-    function hideNoGathering() {
-      // $('#nav-skill-tooltip-1').classList.toggle('d-none')
-      // $('#nav-skill-tooltip-0').remove()
-      var noGathering = [
-        '#nav-skill-tooltip-0', // woodcutting
-        '#nav-skill-tooltip-1', // mining
-        '#nav-skill-tooltip-2', // firemaking
-        '#nav-skill-tooltip-4', // fishing
-        '#nav-skill-tooltip-10', // thiving
-        '#nav-skill-tooltip-20', // agility
-        '#nav-skill-tooltip-22', // astrology
-      ]
-      for (var i = 0; i < noGathering.length; i++) {
-        $(noGathering[i]).remove()
+      function hideNoGathering() {
+        // $('#nav-skill-tooltip-1').classList.toggle('d-none')
+        // $('#nav-skill-tooltip-0').remove()
+        var noGathering = [
+          '#nav-skill-tooltip-0', // woodcutting
+          '#nav-skill-tooltip-1', // mining
+          '#nav-skill-tooltip-2', // firemaking
+          '#nav-skill-tooltip-4', // fishing
+          '#nav-skill-tooltip-10', // thiving
+          '#nav-skill-tooltip-20', // agility
+          '#nav-skill-tooltip-22', // astrology
+        ]
+        for (var i = 0; i < noGathering.length; i++) {
+          $(noGathering[i]).remove()
+        }
       }
     }
 

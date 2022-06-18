@@ -12,8 +12,11 @@
 ;(function () {
   ;('use strict')
 
-  // * Default Page on Load
+  // ========================================================================== //
+  // * setDefaultPage
+  // ========================================================================== //
 
+  // Default Page on Load
   // openDefaultPage(setDefaultPage[0]) // ! test
 
   var setDefaultPage = [
@@ -39,28 +42,14 @@
     var defaultPage = ''
 
     // get default page from setting
-    if (setDefaultPage != 'active skill') {
-      defaultPage = setDefaultPage
-    } else {
+    if (setDefaultPage != 'active skill') defaultPage = setDefaultPage
+    else {
       // get action
       var foo = document.getElementsByClassName('status-action')[0].innerText
       var getAction = foo.match(/[A-z]+/)[0]
-      console.log(getAction)
-
-      if (getAction == 'Fighting') {
-        defaultPage = 'Attack'
-      } else if (getAction == 'Idling') {
-        defaultPage = idlingPage
-      } else {
-        defaultPage = getAction
-      }
-
-      // defaultPage =
-      //   getAction == 'Fighting'
-      //     ? 'Attack'
-      //     : getAction == 'Idling'
-      //     ? 'idle'
-      // : getAction
+      if (getAction == 'Fighting') defaultPage = 'Attack'
+      else if (getAction == 'Idling') defaultPage = idlingPage
+      else defaultPage = getAction
     }
 
     // check default page w left nav. if hit, click
@@ -74,7 +63,9 @@
     }
   }
 
+  // ========================================================================== //
   // * footer
+  // ========================================================================== //
 
   function onGameReady(callback) {
     const foo = 'play-area-container'
@@ -92,6 +83,7 @@
 
   function init() {
     openDefaultPage(setDefaultPage[0])
+    // shortcuts()
   }
 
   onGameReady(function () {

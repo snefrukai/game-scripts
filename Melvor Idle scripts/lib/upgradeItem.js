@@ -32,14 +32,16 @@ window.upgradeItem_repeat = function (itemID, fn, count, minute) {
     recur()
   }
 
-  repeat(itemID)
+  repeat(
+    (itemID = [
+      768, // air shard
+      769, // water ...
+      770, // earth ...
+      771, // fire ...
+      // 890, // mys stone
+      // 886, // mys stone charge
+    ])
+  )
 }
 
-upgradeItem_repeat([
-  768, // air shard
-  769, // water ...
-  770, // earth ...
-  771, // fire ...
-  // 890, // mys stone
-  // 886, // mys stone charge
-])
+// upgradeItem_repeat()

@@ -1,60 +1,67 @@
-// * re-roll monster, re-enter combat zone
+// ========================================================================== //
+// re-roll monster, re-enter combat zone
+// ========================================================================== //
 
 // ========================================================================== //
-// * invoke and parameters
+// invoke and parameters
 
-repeat(rollMonster, (sec = 5), (count = 100000))
+var monsterTargetList = [
+  // ! comment out target monster
+  'Guard ', // ruby
+  // 'Black Knight ',
+  'Infected Naga ', // g/r ore/bar, bracelet
+  // 'Corrupted Tree ', // seeds
+  // 'Bone Giant ', // 1h Chorus of Souls, cape
+  // 'Moss Giant ', // 2h Moss Maul
+  'Fire Giant ', // coal
+  // 'Ice Giant ', // fish, crown, kala
+]
+var combatZoneList = {
+  0: 'Farm',
+  1: 'Caves',
+  2: 'City',
+  3: 'Lava Maze',
+  4: 'Corrupted Lands',
+  5: 'Vally of Giants',
+  6: 'Chaos Wastes',
+}
+repeat(rollMonster, (sec = 3), (count = (60 / 5) * 60 * 24))
+var combatZoneID = 5
 
 function rollMonster() {
   // var ms1 = 1600 // delay after running from combat
   // var ms2 = 3000 // delay after entering combat zone
 
-  var monsterSkipList = [
-    // ! set monsterSkipList: comment out target monster
-    // 'Guard ', // ruby
-    'Black Knight ',
-    'Infected Naga ', // g/r ore/bar, bracelet
-    // 'Corrupted Tree ', // seeds
-    'Bone Giant ', // 1h Chorus of Souls, cape
-    'Moss Giant ', // 2h Moss Maul
-    // 'Fire Giant ', // coal
-    'Ice Giant ', // fish, crown, kala
-  ]
-  var combatZoneList = {
-    0: 'Farm',
-    1: 'Caves',
-    2: 'City',
-    3: 'Lava Maze',
-    4: 'Corrupted Lands',
-    5: 'Vally of Giants',
-    6: 'Chaos Wastes',
-  }
-  // ! set combat zone ID
-  var combatZoneID = 5
-  // var combatZoneID = Object.keys(combatZoneList)[setCombatZoneID]
-  console.log('combatZoneID:', combatZoneID)
-
-  intoZonePage()
-  repeat(checkMonster, (sec = 3), (count = 3))
-  repeat(checkCombatZone, (sec = 3), (count = 3), (para = combatZoneID))
+  // intoZonePage()
+  console.log('target combat zone:', combatZoneList[combatZoneID])
+  repeat(checkMonster, (sec = 1.8), (count = 2))
+  repeat(checkCombatZone, (sec = 0.8), (count = 2), (para = combatZoneID))
 
   // ========================================================================== //
   //
 
-  function intoZonePage() {
-    foo = document.querySelectorAll(
-      '.drawer-item-icon[src="/images/combat/attack_icon.png"]'
-    )
-    foo[1].click()
-  }
+  // function checkAutoEatThreshold(params) {
+  //   var hpChar = document
+  //     .querySelectorAll('.combat-info-bar-health-text')[0]
+  //     .textContent.match(/\d+/g)
+  //   var hpCharCurrent = hpChar[0]
+  //   var hpCharMax = hpChar[1]
+  //   var autoEatThreshold = hpCharMax * 0.2
+  //   if (hpCharCurrent < autoEatThreshold) {
+  //     clickBtnRun()
+  //     console.log('run out of food')
+  //   } else {
+  //     console.log('has food')
+  //   }
+  // }
 
   function checkCombatZone(combatZoneID) {
-    let combatZone = document.getElementsByClassName('combat-zone')
+    var combatZone = document.querySelectorAll('.combat-zone')
     // ! if using $ could be null
     // let combatZone = $('.combat-zone')
     if (combatZone.length == 0) {
       // wait until in zone page shows
-      console.log('not in combat zone page, will check later')
+      // console.log('not in combat zone page, will check later')
       // setTimeout(checkCombatZone(), delay1) // ! delay not working
     } else {
       combatZone[combatZoneID].click()
@@ -64,21 +71,52 @@ function rollMonster() {
   // checkCombatZone()
   // repeat(checkCombatZone) // * works
 
-  function checkMonster() {
-    for (let k = 0; k < monsterSkipList.length; k++) {
-      monster = document.getElementsByClassName(monsterSkipList[k])
+  // ========================================================================== //
+  //
 
-      if (monster.length > 0) {
-        console.log('not target monster, running...')
-        // document.getElementsByClassName('combat-bar-button')[0].click() // test
-        document.getElementsByClassName('combat-bar-button')[4].click() // run
-      } else {
-        console.log('is target monster, fighting...')
+  // repeat(checkMonster) // * works
+
+  function checkMonster() {
+    var foo = document.querySelectorAll('.combat-monster-area')[0]
+
+    if (typeof foo == 'undefined') {
+      console.log('not in combat || no active monbster')
+      return
+    } else {
+      var bar = foo.childNodes[0]
+      if (typeof bar !== 'undefined') {
+        var getMonsterCurrent = bar.className
+        // ! 拿不到className的可能：刷新monster时；不在combat page时
+
+        if (monsterTargetList.includes(getMonsterCurrent)) {
+          // console.log(getMonsterCurrent, 'is target monster')
+        } else {
+          console.log(getMonsterCurrent, ': is not target monster, running...')
+          clickBtnRun()
+        }
       }
     }
+
+    // 相当于自己写了一个 if str in arr
+    // for (let i = 0; i < monsterTargetList.length; i++) {
+    //   var getMonsterCurrent = document.getElementsByClassName(
+    //     monsterTargetList[i]
+    //   )
+    //   if (getMonsterCurrent.length > 0) {
+    //     console.log(getMonsterCurrent, 'is target monster, fighting...')
+    //   } else if (
+    //     typeof document.getElementsByClassName('combat-monster-area') !==
+    //     'undefined'
+    //   ) {
+    //     console.log('is not target monster, running...')
+    // clickBtnRun()
+    //   }
+    // }
   }
-  // checkMonster()
-  repeat(checkMonster) // * works
+
+  function clickBtnRun() {
+    document.querySelectorAll('.combat-bar-button')[4].click()
+  }
 }
 
 function repeat(fn = test, sec = 1, count = 5, para) {
@@ -86,7 +124,9 @@ function repeat(fn = test, sec = 1, count = 5, para) {
   function f() {
     fn(para)
     i += 1
-    console.log(fn.name, i, 'times')
+    if (fn == rollMonster) {
+      console.log(fn.name, i, 'times')
+    }
     setTimeout(function () {
       if (i < count) {
         f()

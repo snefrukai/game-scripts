@@ -1,6 +1,6 @@
 // auto eat to full hp
 
-window.autoEatToFull_repeat = function (params) {
+window.autoEatToFull_repeat = function (minute = 0.2) {
   let hp = {
     current: 0,
     max: 1,
@@ -56,7 +56,7 @@ window.autoEatToFull_repeat = function (params) {
     }
     recur()
   }
-  repeat()
+  repeat(autoEatToFull, (count = (60 / minute) * 24), (minute = minute))
 }
 
-autoEatToFull_repeat()
+autoEatToFull_repeat() // ! test

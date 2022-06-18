@@ -31,7 +31,7 @@
 
     snippet.name = 'upgradeItem_repeat.js'
     snippet.start()
-    // * start of copy code
+    // start of copy code
 
     // auto upgrade selected item by item ID at set interval
 
@@ -67,19 +67,21 @@
         recur()
       }
 
-      repeat(itemID)
+      repeat(
+        (itemID = [
+          768, // air shard
+          769, // water ...
+          770, // earth ...
+          771, // fire ...
+          // 890, // mys stone
+          // 886, // mys stone charge
+        ])
+      )
     }
 
-    upgradeItem_repeat([
-      768, // air shard
-      769, // water ...
-      770, // earth ...
-      771, // fire ...
-      // 890, // mys stone
-      // 886, // mys stone charge
-    ])
+    // upgradeItem_repeat()
 
-    // * end of copy code
+    // end of copy code
     snippet.end()
 
     // ========================================================================== //
@@ -88,7 +90,7 @@
 
     snippet.name = 'noGathering.js'
     snippet.start()
-    // * start of copy code
+    // start of copy code
 
     // hide no gathering account's skills
 
@@ -119,7 +121,7 @@
 
     checkNoGathering()
 
-    // * end of copy code
+    // end of copy code
     snippet.end()
 
     // ========================================================================== //
@@ -128,11 +130,11 @@
 
     snippet.name = 'autoEatToFull_repeat.js'
     snippet.start()
-    // * start of copy code
+    // start of copy code
 
     // auto eat to full hp
 
-    window.autoEatToFull_repeat = function (params) {
+    window.autoEatToFull_repeat = function (minute = 0.2) {
       let hp = {
         current: 0,
         max: 1,
@@ -188,12 +190,12 @@
         }
         recur()
       }
-      repeat()
+      repeat(autoEatToFull, (count = (60 / minute) * 24), (minute = minute))
     }
 
-    autoEatToFull_repeat()
+    // autoEatToFull_repeat() // ! test
 
-    // * end of copy code
+    // end of copy code
     snippet.end()
 
     // ========================================================================== //
@@ -206,8 +208,16 @@
       // Only load script after game has opened
       clearInterval(scriptLoader)
       startSnippets()
+      console.log(
+        'repeat action code: upgradeItem_repeat(), autoEatToFull_repeat()'
+      )
+      // hide non-combat skill menue on load
+      $$('.nav-main-heading')[4].childNodes[1].click()
     }
   }
 
   const scriptLoader = setInterval(loadScript, 200)
 })
+
+var popupSelector = '.MuiDialog-container'
+document.querySelectorAll[popupSelector][0]

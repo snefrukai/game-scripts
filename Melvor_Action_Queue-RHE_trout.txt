@@ -1,1 +1,0 @@
-[["Idle","","","","",[["Start Combat","Raging Horned Elite","","",""],["Switch Equipment Set","1","","",""]]],["Item Quantity","Trout","≥","","30",[["Equip Item","Trout","","",""]]]]

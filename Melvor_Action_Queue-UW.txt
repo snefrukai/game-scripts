@@ -1,1 +1,0 @@
-[["Enemy in Combat","Greater Skeletal Dragon","","","",[["Switch Equipment Set","3","","",""]]]]

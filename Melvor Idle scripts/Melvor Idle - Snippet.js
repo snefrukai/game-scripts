@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Melvor Idle - Snippet
 // @namespace    http://tampermonkey.net/
-// @version      0.2
+// @version      0.3
 // @description  try to take over the world!
 // @author       snefrukai
 // @match                 *://melvoridle.com/*
@@ -15,6 +15,7 @@
   script.textContent = `try { (${main})(); } catch (e) { console.log(e); }`
   document.body.appendChild(script).parentNode.removeChild(script)
 })(() => {
+  // * invoke func
   function startSnippets() {
     window.snippet = {
       name: '',
@@ -22,8 +23,6 @@
       start: () => snippet.log(`Loading ${snippet.name}.`),
       end: () => snippet.log(`Loaded ${snippet.name}.`),
     }
-
-    // * header end
 
     // ========================================================================== //
     // * upgradeItem_repeat.js
@@ -59,10 +58,8 @@
           i += 1
           console.log('upgraded', i, 'times')
           setTimeout(function () {
-            if (i < count) {
-              recur()
-            }
-          }, 1000 * 60 * minute)
+            if (i < count) recur()
+          }, 1000 * sec)
         }
         recur()
       }
@@ -92,30 +89,29 @@
     snippet.start()
     // start of copy code
 
-    // hide no gathering account's skills
+    //  hide no gathering account's skills
 
     function checkNoGathering() {
+      var noGatheringSkills = [
+        '#nav-skill-tooltip-0', // woodcutting
+        '#nav-skill-tooltip-1', // mining
+        '#nav-skill-tooltip-2', // firemaking
+        '#nav-skill-tooltip-4', // fishing
+        '#nav-skill-tooltip-10', // thiving
+        '#nav-skill-tooltip-20', // agility
+        '#nav-skill-tooltip-22', // astrology
+      ]
+
       if (username && username.includes('NG')) {
         console.log('Detected No Gathering.')
         hideNoGathering()
-        console.log('No Gathering skills hidden.')
       }
 
       function hideNoGathering() {
-        // $('#nav-skill-tooltip-1').classList.toggle('d-none')
-        // $('#nav-skill-tooltip-0').remove()
-        var noGathering = [
-          '#nav-skill-tooltip-0', // woodcutting
-          '#nav-skill-tooltip-1', // mining
-          '#nav-skill-tooltip-2', // firemaking
-          '#nav-skill-tooltip-4', // fishing
-          '#nav-skill-tooltip-10', // thiving
-          '#nav-skill-tooltip-20', // agility
-          '#nav-skill-tooltip-22', // astrology
-        ]
-        for (var i = 0; i < noGathering.length; i++) {
-          $(noGathering[i]).remove()
+        for (var i = 0; i < noGatheringSkills.length; i++) {
+          $(noGatheringSkills[i]).remove()
         }
+        console.log('No Gathering skills hidden.')
       }
     }
 
@@ -125,16 +121,16 @@
     snippet.end()
 
     // ========================================================================== //
-    // * autoEatToFull_repeat.js
+    // * eatToFull_repeat.js
     // ========================================================================== //
 
-    snippet.name = 'autoEatToFull_repeat.js'
+    snippet.name = 'eatToFull_repeat.js'
     snippet.start()
     // start of copy code
 
     // auto eat to full hp
 
-    window.autoEatToFull_repeat = function (minute = 0.2) {
+    window.eatToFull_repeat = function (sec = 3) {
       let hp = {
         current: 0,
         max: 1,
@@ -146,7 +142,7 @@
       }
       var activeFoodSelector = '#combat-food-container .text-combat-smoke'
 
-      function autoEatToFull(params) {
+      function eatToFull(params) {
         var hpSelectorArr = Object.entries(hpSelector)
         for (let i = 0; i < hpSelectorArr.length; i++) {
           let str = $(hpSelectorArr[i][1])[0].textContent
@@ -176,40 +172,161 @@
         return numb
       }
 
-      function repeat(fn = autoEatToFull, count = 60 * 24, minute = 1) {
+      function repeat(fn = eatToFull, count = 60 * 24, sec = 1) {
         let i = 0
         function recur() {
           fn()
           i += 1
-          console.log('auto eat', i, 'times, next check in', minute, 'minute')
+          // console.log('auto eat', i, 'times, next check in', sec, 'sec')
           setTimeout(function () {
-            if (i < count) {
-              recur()
-            }
-          }, 1000 * 60 * minute)
+            if (i < count) recur()
+          }, 1000 * sec)
         }
         recur()
       }
-      repeat(autoEatToFull, (count = (60 / minute) * 24), (minute = minute))
+      repeat(eatToFull, (count = (3600 / sec) * 72), (sec = sec))
     }
 
-    // autoEatToFull_repeat() // ! test
+    // eatToFull_repeat() // ! test
 
     // end of copy code
     snippet.end()
 
     // ========================================================================== //
-    // * footer start
+    // * equipmentSwap.js
     // ========================================================================== //
+
+    snippet.name = 'equipmentSwap.js'
+    snippet.start()
+    // start of copy code
+
+    // auto swap equip according to combat triangle while in combat
+
+    window.enableAutoEquipmentSwap = true
+    window.useMaxLvlPrayer = false
+    window.useMaxLvlCurseAndAurora = false
+
+    window.autoEquipmentSwap = function () {
+      var delaySec = 1
+      const equipmentSetMelee = 0
+      const equipmentSetRanged = 1
+      const equipmentSetMagic = 2
+      const enemyTypeMelee = 'melee'
+      const enemyTypeRanged = 'ranged'
+      const enemyTypeMagic = 'magic'
+
+      // ========================================================================== //
+      //
+
+      function addCheckbox(name, varStr, pos, type = 'checkbox') {
+        // 感觉调用起来时参数会很复杂？
+        var checkbox = document.createElement('input')
+        checkbox.type = type
+        checkbox.id = varStr
+
+        var label = document.createElement('label')
+        label.appendChild(document.createTextNode(name))
+
+        document.querySelector(pos).prepend(label)
+        label.prepend(checkbox)
+
+        var checkboxTarget = document.querySelector('#' + varStr) // ? class and ID?
+        checkboxTarget.onclick = function () {
+          if (checkboxTarget.checked) window[varStr] = true
+          else window[varStr] = false
+        }
+      }
+
+      addCheckbox(
+        'auto swap equiment',
+        (varStr = Object.keys({ enableAutoEquipmentSwap })[0]),
+        (pos = '#header-theme')
+      )
+      if (window.enableAutoEquipmentSwap)
+        console.log('autoEquipmentSwap enabled')
+      setInterval(swapEquimentSet(), 1000 * delaySec)
+
+      function swapEquimentSet() {
+        if (
+          window.enableAutoEquipmentSwap &&
+          combatManager['fightInProgress']
+        ) {
+          // console.log(enableAutoEquipmentSwap, window.enableAutoEquipmentSwap)
+          const playerSet = player.selectedEquipmentSet // in-game func
+          const enemyType = combatManager.enemy.attackType // in-game func
+
+          if (enemyType === enemyTypeMelee && playerSet != equipmentSetMagic) {
+            player.changeEquipmentSet(equipmentSetMagic)
+            if (useMaxLvlPrayer) changePrayers([30, 24]) // 24: "Augury"
+            if (useMaxLvlCurseAndAurora) {
+              player.toggleCurse(12)
+              player.toggleAurora(5)
+              // * Curses
+              // 4: "BlindingII"
+              // 5: "SoulSplitII"
+              // 6: "WeakeningII"
+              // 8: "AnguishII"
+              // 9: "BlindingIII"
+              // 10: "SoulSplitIII"
+              // 11: "WeakeningIII"
+              // 12: "AnguishIII"
+              // 13: "Decay"
+              // * Auroras
+              //         5: "FuryII"
+              // 6: "FervorII"
+              // 7: "SurgeIII"
+              // 8: "ChargedII"
+              // 9: "FuryIII"
+              // 10: "FervorIII"
+              // 11: "ChargedIII"
+            }
+          } else if (
+            enemyType === enemyTypeRanged &&
+            playerSet != equipmentSetMelee
+          ) {
+            player.changeEquipmentSet(equipmentSetMelee)
+            if (useMaxLvlPrayer) changePrayers([30, 22]) // 22: "Piety"
+          } else if (
+            enemyType === enemyTypeMagic &&
+            playerSet != equipmentSetRanged
+          ) {
+            player.changeEquipmentSet(equipmentSetRanged)
+            if (useMaxLvlPrayer) changePrayers([30, 23]) // 23: "Rigour"
+          }
+        }
+        // * prayers
+        // 30: "Battleheart"
+      }
+
+      function changePrayers(activatePrayer = []) {
+        for (const i of player.activePrayers.entries()) {
+          activatePrayer.includes(i[0]) // if target prayer is active, leave it unchangde
+            ? activatePrayer.splice(
+                activatePrayer.findIndex((a) => a == i[0]),
+                1
+              )
+            : activatePrayer.unshift(i[0]) // adds to the beginning of array
+        }
+        for (const i of activatePrayer) player.togglePrayer(i) // in-game func
+      }
+    }
+
+    autoEquipmentSwap()
+
+    // end of copy code
+    snippet.end()
   }
 
+  // * footer
   function loadScript() {
     if (typeof isLoaded !== typeof undefined && isLoaded) {
       // Only load script after game has opened
       clearInterval(scriptLoader)
       startSnippets()
+
+      // ========================================================================== //
       console.log(
-        'repeat action code: upgradeItem_repeat(), autoEatToFull_repeat()'
+        'repeat action code: upgradeItem_repeat(), eatToFull_repeat()'
       )
       // hide non-combat skill menue on load
       $$('.nav-main-heading')[4].childNodes[1].click()
@@ -218,6 +335,3 @@
 
   const scriptLoader = setInterval(loadScript, 200)
 })
-
-var popupSelector = '.MuiDialog-container'
-document.querySelectorAll[popupSelector][0]

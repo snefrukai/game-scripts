@@ -1,7 +1,4 @@
-//  hide no gathering account's skills
-
-checkNoGathering()
-
+// * hide no gathering account's skills
 function checkNoGathering() {
   if (username && username.includes('NG')) {
     console.log('Detected No Gathering.')
@@ -28,3 +25,5 @@ function checkNoGathering() {
     }
   }
 }
+
+// checkNoGathering()

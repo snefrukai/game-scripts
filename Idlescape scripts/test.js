@@ -1,26 +1,4 @@
-// ========================================================================== //
-// * check action
-// ========================================================================== //
-
-$('.status-action').childNodes
-$('.status-action').childNodes[0].innerHTML // Fighting
-$('.status-action').childNodes[0].textContent // Fighting
-
-// ========================================================================== //
-// * click page
-// ========================================================================== //
-
-leftNavSrc = '.drawer-item.active.noselect .drawer-item-left .drawer-item-icon'
-
-foo = leftNavSrc + '[src="/images/runecrafting/RuneCraftingIcon.png"]'
-$(foo) // works
-$(foo).click() // works
-
-foo = leftNavSrc + '[src="/images/cooking/cooking_icon.png"'
-$$(foo) // works
-$(foo).click() // works
-
-// * help
+// * help: get left nav hit
 
 function contains(selector, text) {
   var elements = document.querySelectorAll(selector)
@@ -61,16 +39,6 @@ getIndex()
 foo = 'Mining'
 foo = 'Cooking'
 leftNav[shortcut[foo]].click()
-
-// ========================================================================== //
-// * check monster
-// ========================================================================== //
-
-foo = document.getElementsByClassName('Corrupted Tree ')
-foo = document.getElementsByClassName('Infected Naga ')
-if (foo.length > 0) {
-  $$('.combat-bar-button')[4].click()
-}
 
 // ========================================================================== //
 // * test

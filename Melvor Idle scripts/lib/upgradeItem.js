@@ -1,5 +1,4 @@
-// auto upgrade selected item by item ID at set interval
-
+// * upgrade selected item by item ID at set interval
 window.upgradeItem_repeat = function (itemID, fn, count, minute) {
   function upgradedItemID(itemID) {
     return items[itemID].trimmedItemID

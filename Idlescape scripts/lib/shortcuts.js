@@ -1,46 +1,40 @@
-// ========================================================================== //
 // * shortcuts
-// ========================================================================== //
-
 // shortcuts() // ! test
-
 function shortcuts(params) {
-  // ========================================================================== //
   // close popups
-
-  var popupSelector = '.MuiDialog-container'
+  const popupSelector = '.MuiDialog-container'
+  const closeSelector = '.close-dialog-button'
 
   // when press 'Esc'
   document.onkeydown = function (e) {
-    var closePopup = e.key === 'Escape' || e.key === 'Esc'
-    if (closePopup) if (checkExist(popupSelector)) clickClose()
+    const closePopup = e.key === 'Escape' || e.key === 'Esc'
+    if (closePopup) if (checkExist(popupSelector)) clickClose(closeSelector)
   }
 
   // when click outside of popup box
   document.querySelector('#root').onclick = function (e) {
     // only when popup is shown, only add click to popup
     if (checkExist(popupSelector)) {
-      var popup = document.querySelectorAll(popupSelector)[0]
+      const popup = document.querySelectorAll(popupSelector)[0]
       popup.onclick = function (e) {
         // document.querySelector('#root').onclick = function (e) {
-        var isClosest = e.target.closest('.MuiPaper-root') // popupBox
-        if (!isClosest) clickClose()
+        var clickOnPopup = e.target.closest('.MuiPaper-root') // popupBox
+        if (!clickOnPopup) clickClose(closeSelector)
       }
     }
   }
 
   function checkExist(selector) {
-    var tar = document.querySelectorAll(selector)
-    var isExist = tar.length !== 0
-    // if (isExist) console.log(selector, 'exist') // ! test
+    const isExist = document.querySelectorAll(selector).length !== 0
     return isExist
   }
 
-  function clickClose() {
-    foo = '.close-dialog-button'
-    if (checkExist(foo)) {
-      document.querySelectorAll(foo)[0].click()
+  function clickClose(selector) {
+    if (checkExist(selector)) {
+      document.querySelectorAll(selector)[0].click()
+      return true
     }
+    return false
   }
 }
 

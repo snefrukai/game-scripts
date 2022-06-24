@@ -1,5 +1,4 @@
 // * Default Page on Load
-openDefaultPage() // ! test
 function openDefaultPage() {
   const setDefaultPage = [
     // ! change and comment out the default page
@@ -26,8 +25,8 @@ function openDefaultPage() {
   } else if (setDefaultPage[0] == 'active skill') {
     // set action as default page
     let getAction = document
-      .querySelectorAll('.status-action')[0]
-      .innerText.match(/[A-z]+/)[0]
+    .querySelectorAll('.status-action')[0]
+    .innerText.match(/[A-z]+/)[0]
     switch (getAction) {
       case 'Fighting':
         defaultPage = 'Attack'
@@ -35,8 +34,8 @@ function openDefaultPage() {
       case 'Idling':
         defaultPage = idlingPage
         break
-      default:
-        defaultPage = getAction
+        default:
+          defaultPage = getAction
     }
 
     // if (getAction == 'Fighting') defaultPage = 'Attack'
@@ -45,7 +44,7 @@ function openDefaultPage() {
 
     // console.log(defaultPage)
   }
-
+  
   // check default page w left nav. if hit, click
   for (let i = 0; i < leftNav.length; i++) {
     let sample = leftNav[i].textContent
@@ -56,3 +55,5 @@ function openDefaultPage() {
     }
   }
 }
+
+openDefaultPage() // ! test

@@ -3,10 +3,10 @@ var itemID = 987 // crow
 // ========================================================================== //
 //
 
-const summonSlot1 = player.equipment.getSlotOfItemID(itemID)
+const summonSlotUsed = player.equipment.getSlotOfItemID(itemID)
 const otherSlot = (slot) => (slot === 'Summon1' ? 'Summon2' : 'Summon1')
-const summonEmpty = otherSlot(summonSlot1)
-console.log(summonEmpty)
+const summonSlotEmp = otherSlot(summonSlotUsed)
+console.log(summonSlotEmp)
 
 // ========================================================================== //
 //

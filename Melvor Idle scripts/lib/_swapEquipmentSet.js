@@ -1,11 +1,12 @@
+var equipmentSetNonCombat = 3
 swapEquipmentSet() // ! test
 
 function swapEquipmentSet() {
-  const equipmentSetNonCombat = 3
   const playerAttackTypes = getPlayerAttackTypes(equipmentSetNonCombat)
   var setTarget = null
 
   if (game.activeSkill != 1) {
+    // non-combat
     setTarget = equipmentSetNonCombat
   } else {
     // combat
@@ -19,8 +20,13 @@ function swapEquipmentSet() {
     }
     // console.log(setTarget, playerAttackTypes)
   }
-  player.changeEquipmentSet(setTarget)
-  console.log('swap to set', setTarget)
+
+  if (setTarget != player.selectedEquipmentSet) {
+    player.changeEquipmentSet(setTarget)
+    console.log('swap to set', setTarget)
+    return true
+  }
+  return false
 
   // ========================================================================== //
   //
@@ -53,13 +59,6 @@ function swapEquipmentSet() {
       arr.push(player.equipmentSets[i].slots.Weapon.item.attackType)
     }
     return arr
-
-    // var i = 0
-    // player.equipmentSets.forEach((e) => {
-    //   if (i == equipmentSetNonCombat) return true
-    //   arr.push(e.slots.Weapon.item.attackType)
-    //   i++
-    // })
   }
 }
 

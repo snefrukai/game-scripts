@@ -1,10 +1,11 @@
+// changePrayer([0, 1]) // ! test
+changePrayer(['Thick_Skin', 'Burst_of_Strength']) // ! test
+
 window.changePrayer = function (activatePrayer = []) {
   var arrTemp = []
   for (const i of activatePrayer) {
-    if (typeof i == 'string') {
-      console.log(i)
-      arrTemp.push(Prayers[i])
-    }
+    if (typeof i == 'string') arrTemp.push(Prayers[i])
+    // console.log(i)
   }
   // console.log(arrTemp)
   activatePrayer = arrTemp
@@ -19,10 +20,5 @@ window.changePrayer = function (activatePrayer = []) {
         )
       : activatePrayer.unshift(i[0]) // adds to the beginning of array
   }
-  for (const i of activatePrayer) {
-    player.togglePrayer(i) // in-game func
-  }
+  for (const i of activatePrayer) player.togglePrayer(i) // in-game func
 }
-
-// changePrayer([0, 1]) // ! test
-changePrayer(['Thick_Skin']) // ! test

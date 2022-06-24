@@ -6,15 +6,15 @@ window.autoChangeEquipmentAndBuff = function () {
       activeID: 11,
       name: 'Runecrafting',
       equipment: [
-        'Runecrafting_Skillcape',
+        // 'Runecrafting_Skillcape',
         'Summoning_Familiar_Crow',
         'Summoning_Familiar_Bear',
         // universal
         'Crown_of_Rhaelyx',
         'Clue_Chasers_Insignia',
         'Aorpheats_Signet_Ring',
-        'Max_Skillcape',
-        { passive: 'Ring_Of_Wealth' },
+        // 'Max_Skillcape',
+        // { passive: 'Ring_Of_Wealth' }, // ! only if have passive slot
       ],
     },
     {
@@ -68,38 +68,34 @@ window.autoChangeEquipmentAndBuff = function () {
   function changeEquipmentAndBuff() {
     for (const obj of equipmentAndBuff.values()) {
       switch (game.activeSkill) {
-        case 1: // in combat
-          if (combatManager.fightInProgress) {
-            swapEquipmentSet()
-          }
+        case 1: // is in combat
           if ((combatManager.enemy.data.id = obj.monsterID)) {
-            let activatePrayer = []
-            for (const str of obj.prayer.values()) {
-              activatePrayer.push(Prayers[str]) // change str to ID number
-            }
-            changePrayer(activatePrayer)
-            // ?equipment
+            // let activatePrayer = []
+            // for (const str of obj.prayer.values()) activatePrayer.push(Prayers[str]) // change str to ID number
+            swapEquipmentSet()
+            changePrayer(obj.prayer)
+            // !equipment
           }
-        case obj.activeID: // in non-combat
+          break // ! no break means SERIOUS bug
+        case obj.activeID: // is in non-combat
           var summonSlotEmp = 'Summon1'
-          if (player.selectedEquipmentSet != equipmentSetNonCombat)
-            player.changeEquipmentSet(equipmentSetNonCombat)
+          swapEquipmentSet()
+          // * loop equipments' setting and changde
           for (const val of obj.equipment.values()) {
-            // get setting val
             const isPassive =
               typeof val == 'object' && Object.keys(val)[0] == 'passive'
             const itemID = isPassive ? Items[val.passive] : Items[val]
             const bankID = getBankId(itemID)
 
             if (
+              // owned && not equipped in current set
               doesPlayerOwnItem(itemID) &&
               !player.equipment.checkForItemID(itemID)
             ) {
-              // on other equipment sets: ... && not in bank
-              if (!checkBankForItem(itemID)) fetchUnequippedItemFromSets(itemID)
-              // afterwhile item is in bank
+              fetchItemFromAllSets(itemID)
+              // afterwhile target item is in bank
               if (items[itemID].type == 'Familiar') {
-                // ! 如果synergy顺序不对会重装。是否有必要继续优化？
+                // ! 如果synergy顺序不对,会重装。是否有必要继续优化？
                 const summonSlotUsed = player.equipment.getSlotOfItemID(itemID)
                 const otherSlot = (slot) =>
                   slot === 'Summon1' ? 'Summon2' : 'Summon1'
@@ -110,41 +106,44 @@ window.autoChangeEquipmentAndBuff = function () {
                   // ? no need to equip max?
                 } else {
                   console.log('equip', items[itemID], summonSlotEmp) // 如果顺序不对会被顶掉
-                  equipFamiliar(itemID, summonSlotEmp)
+                  player.equipItem(
+                    itemID,
+                    // player.selectedEquipmentSet,
+                    equipmentSetNonCombat,
+                    summonSlotEmp,
+                    bank[bankID].qty
+                  )
                   summonSlotEmp = 'Summon2'
                 }
               } else if (isPassive) {
                 console.log('equip passive', Items[itemID])
-                player.equipCallback(itemID, 'Passive')
+                player.equipItem(itemID, player.selectedEquipmentSet, 'Passive')
+                // player.equipItem(itemID, equipmentSetNonCombat, 'Passive')
+                // player.equipCallback(itemID, 'Passive')
               } else {
                 console.log('equip', Items[itemID])
-                player.equipCallback(itemID)
+                player.equipItem(itemID, player.selectedEquipmentSet)
+                // player.equipCallback(itemID) // ! buggy: could equip in differentset
+                // ! 怎样避免max cape和skill cape循环地equip
               }
             }
-
-            function equipFamiliar(itemID, slotStr) {
-              player.equipItem(
-                itemID,
-                player.selectedEquipmentSet,
-                slotStr,
-                bank[bankID].qty
-              )
-            }
           }
+          break
+        default:
+        // equip BiSs for each activity
       }
     }
   }
 
-  function fetchUnequippedItemFromSets(itemID) {
-    // if (doesPlayerOwnItem(itemID) == false) return // is not owned
-    // else if (player.equipment.checkForItemID(itemID)) return false // is equipped
-    // else if (checkBankForItem(itemID) == true) return true // is in bank
-    if (doesPlayerOwnItem(itemID) && player.checkEquipmentSetsForItem(itemID)) {
-      // item is equipped on other equipment sets > unequip
-      var setCurrent = player.selectedEquipmentSet
-      // var setTarget = [0, 1, 2, 3].filter((set) => set != setCurrent)
-      var setTarget = [0, 1, 2, 3]
-
+  function fetchItemFromAllSets(itemID) {
+    if (!doesPlayerOwnItem(itemID)) return false // is not owned
+    // else if (player.equipment.checkForItemID(itemID)) // is equipped
+    else if (checkBankForItem(itemID)) return false // is in bank
+    else if (player.checkEquipmentSetsForItem(itemID)) {
+      // * owned && equipped in sets:
+      // fetch and unequip(including current set)
+      const setTarget = [0, 1, 2, 3]
+      // const setTarget = [0, 1, 2, 3].filter((set) => set != setCurrent)
       var set = -1
       var slot = -1
       var foo = getSet(setTarget)
@@ -155,21 +154,24 @@ window.autoChangeEquipmentAndBuff = function () {
         return true
       }
 
+      // ========================================================================== //
+      //
+
       function getSet(setTarget) {
-        // var slot = -1
-        var iSet = setTarget.findIndex((setTemp) => {
-          var slotTemp = getSlot(setTemp)
+        const setIndex = setTarget.findIndex((setTemp) => {
+          const slotTemp = getSlot(setTemp)
           slot = slotTemp
           return slotTemp != -1
         })
         // console.log(setTarget, 'setIndex', setIndex)
-        if (iSet == -1) return [-1, -1]
-        else return [setTarget[iSet], slot]
+        if (setIndex == -1) return [-1, -1]
+        else return [setTarget[setIndex], slot]
 
         function getSlot(set) {
-          var slot = player.equipmentSets[set].slotArray.findIndex(
+          const slot = player.equipmentSets[set].slotArray.findIndex(
             (element) => element.item.id == itemID // 搞了变天是既没有把{}去掉，也没用return
           )
+          // var slot= player.equipment.getSlotOfItemID(itemID)
           return slot
         }
       }
@@ -179,50 +181,73 @@ window.autoChangeEquipmentAndBuff = function () {
         if (set == -1 || slot == -1)
           return console.log('invalid set or slot:', set, slot)
 
-        let setCurrentTemp = player.selectedEquipmentSet
+        let setCurrent = player.selectedEquipmentSet
         if (player.selectedEquipmentSet != set) {
           player.changeEquipmentSet(set)
           player.unequipItem(set, EquipmentSlots[slot])
-          player.changeEquipmentSet(setCurrentTemp)
+          player.changeEquipmentSet(setCurrent)
+          console.log(
+            'changed set',
+            set,
+            ' and unequipped',
+            Items[itemID],
+            'slot',
+            slot
+          )
         } else {
           player.unequipItem(set, EquipmentSlots[slot])
+          console.log('unequipped', Items[itemID], 'current set', 'slot', slot)
         }
-        console.log('unequipped', Items[itemID], ': set', set, 'slot', slot)
       }
     }
     return false
   }
 
   function swapEquipmentSet() {
-    const equipmentSetNonCombat = 3
-    var playerAttackTypes = getPlayerAttackTypes(equipmentSetNonCombat)
-    var setTarget = getSetTarget()
-    var setSameType = getSetTarget((setDefault = true))
+    const playerAttackTypes = getPlayerAttackTypes(equipmentSetNonCombat)
+    var setTarget = null
 
-    if (setTarget == -1) {
-      // dont even have same attack type set w the enemy
-      if (setSameType == -1) return console.log('!go get a weapon man!')
-      setTarget = setSameType
+    if (game.activeSkill != 1) {
+      setTarget = equipmentSetNonCombat
+    } else {
+      // combat
+      const setSameType = getSetByEnemy((setDefault = true))
+      setTarget = getSetByEnemy()
+
+      if (setTarget == -1) {
+        // dont even have same attack type set w the enemy
+        if (setSameType == -1) return console.log('!go get a weapon man!')
+        setTarget = setSameType
+      }
+      // console.log(setTarget, playerAttackTypes)
     }
-    player.changeEquipmentSet(setTarget)
-    // console.log(setTarget, playerAttackTypes)
-    console.log('switched to set', setTarget)
+
+    if (setTarget != player.selectedEquipmentSet) {
+      player.changeEquipmentSet(setTarget)
+      console.log('swap to set', setTarget)
+      return true
+    }
+    return false
+
+    // ========================================================================== //
+    //
 
     // getSetTarget()
-    function getSetTarget(setDefault) {
-      var setTarget = ''
-      switch (combatManager.enemy.attackType) {
-        case 'melee':
-          setTarget = 'magic'
-        case 'ranged':
-          setTarget = 'melee'
-        case 'magic':
-          setTarget = 'melee'
-        default:
-          setTarget = combatManager.enemy.attackType
+    function getSetByEnemy(setDefault) {
+      if (setDefault == true) {
+        // if enemy is melee, but dont have magic set > use the first melee set
+        setTarget = combatManager.enemy.attackType
+      } else {
+        switch (combatManager.enemy.attackType) {
+          case 'melee':
+            setTarget = 'magic'
+          case 'ranged':
+            setTarget = 'melee'
+          case 'magic':
+            setTarget = 'melee'
+        }
       }
-      // if enemy is melee, but dont have magic set > use the first melee set
-      if (setDefault) setTarget = combatManager.enemy.attackType
+      // console.log('enemy type is', combatManager.enemy.attackType)
       return playerAttackTypes.findIndex((e) => e == setTarget)
     }
 
@@ -248,10 +273,8 @@ window.autoChangeEquipmentAndBuff = function () {
   window.changePrayer = function (activatePrayer = []) {
     var arrTemp = []
     for (const i of activatePrayer) {
-      if (typeof i == 'string') {
-        console.log(i)
-        arrTemp.push(Prayers[i])
-      }
+      if (typeof i == 'string') arrTemp.push(Prayers[i])
+      // console.log(i)
     }
     // console.log(arrTemp)
     activatePrayer = arrTemp
@@ -266,9 +289,7 @@ window.autoChangeEquipmentAndBuff = function () {
           )
         : activatePrayer.unshift(i[0]) // adds to the beginning of array
     }
-    for (const i of activatePrayer) {
-      player.togglePrayer(i) // in-game func
-    }
+    for (const i of activatePrayer) player.togglePrayer(i) // in-game func
   }
 }
 

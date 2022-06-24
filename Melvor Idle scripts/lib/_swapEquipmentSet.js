@@ -2,34 +2,45 @@ swapEquipmentSet() // ! test
 
 function swapEquipmentSet() {
   const equipmentSetNonCombat = 3
-  var playerAttackTypes = getPlayerAttackTypes(equipmentSetNonCombat)
-  var setTarget = getSetTarget()
-  var setSameType = getSetTarget((setDefault = true))
+  const playerAttackTypes = getPlayerAttackTypes(equipmentSetNonCombat)
+  var setTarget = null
 
-  if (setTarget == -1) {
-    // dont even have same attack type set w the enemy
-    if (setSameType == -1) return console.log('!go get a weapon man!')
-    setTarget = setSameType
+  if (game.activeSkill != 1) {
+    setTarget = equipmentSetNonCombat
+  } else {
+    // combat
+    const setSameType = getSetByEnemy((setDefault = true))
+    setTarget = getSetByEnemy()
+
+    if (setTarget == -1) {
+      // dont even have same attack type set w the enemy
+      if (setSameType == -1) return console.log('!go get a weapon man!')
+      setTarget = setSameType
+    }
+    // console.log(setTarget, playerAttackTypes)
   }
   player.changeEquipmentSet(setTarget)
-  // console.log(setTarget, playerAttackTypes)
-  console.log('switched to set', setTarget)
+  console.log('swap to set', setTarget)
+
+  // ========================================================================== //
+  //
 
   // getSetTarget()
-  function getSetTarget(setDefault) {
-    var setTarget = ''
-    switch (combatManager.enemy.attackType) {
-      case 'melee':
-        setTarget = 'magic'
-      case 'ranged':
-        setTarget = 'melee'
-      case 'magic':
-        setTarget = 'melee'
-      default:
-        setTarget = combatManager.enemy.attackType
+  function getSetByEnemy(setDefault) {
+    if (setDefault == true) {
+      // if enemy is melee, but dont have magic set > use the first melee set
+      setTarget = combatManager.enemy.attackType
+    } else {
+      switch (combatManager.enemy.attackType) {
+        case 'melee':
+          setTarget = 'magic'
+        case 'ranged':
+          setTarget = 'melee'
+        case 'magic':
+          setTarget = 'melee'
+      }
     }
-    // if enemy is melee, but dont have magic set > use the first melee set
-    if (setDefault) setTarget = combatManager.enemy.attackType
+    // console.log('enemy type is', combatManager.enemy.attackType)
     return playerAttackTypes.findIndex((e) => e == setTarget)
   }
 

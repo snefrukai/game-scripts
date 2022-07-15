@@ -59,30 +59,40 @@ window.upgradeItem_repeat = function (itemID, fn, count, minute) {
 }
 
 // * hide no gathering account's skills
-function checkNoGathering() {
+window.checkNoGathering = function () {
+  var noGatheringSkills = [
+    0, // woodcutting
+    1, // mining
+    2, // firemaking
+    4, // fishing
+    10, // thiving
+    20, // agility
+    22, // astrology
+  ]
+
   if (username && username.includes('NG')) {
-    console.log('Detected No Gathering.')
-    hideNoGathering()
-    console.log('No Gathering skills hidden.')
-  }
+    console.log('Detected "No Gathering".')
 
-  function hideNoGathering() {
-    // $('#nav-skill-tooltip-1').classList.toggle('d-none')
-    // $('#nav-skill-tooltip-0').remove()
+    noGatheringSkills.forEach((skill) => {
+      $('#nav-skill-tooltip-' + skill.toString()).remove()
 
-    var noGatheringSkills = [
-      '#nav-skill-tooltip-0', // woodcutting
-      '#nav-skill-tooltip-1', // mining
-      '#nav-skill-tooltip-2', // firemaking
-      '#nav-skill-tooltip-4', // fishing
-      '#nav-skill-tooltip-10', // thiving
-      '#nav-skill-tooltip-20', // agility
-      '#nav-skill-tooltip-22', // astrology
-    ]
+      // in-game func
+      if (skillsUnlocked[skill] != false) {
+        skillsUnlocked[skill] = false
+        forceStopSkill(skill)
+        if (
+          PAGES[currentPage].skillID !== undefined &&
+          PAGES[currentPage].skillID === skill
+        )
+          changePage(Pages.Bank)
+        if (defaultPageOnLoad === skill)
+          changeSetting(2, Pages.Bank, false, false)
+        updateSkillWindow(skill) // update ui
+        updateSkillLevelCap()
+      }
+    })
 
-    for (var i = 0; i < noGatheringSkills.length; i++) {
-      $(noGatheringSkills[i]).remove()
-    }
+    console.log('"No Gathering" skills locked and hidden.')
   }
 }
 
@@ -148,22 +158,22 @@ window.autoEatToFull_repeat = function (minute = 0.2) {
 
 // * add mastery pool xp to skill after overnight
 
-window.addPoolXPForCount = function (skillID, count) {
+window.addPoolXPForCount = function (skillID, count, sec = 30) {
   var i = 0
   var checkPool = setInterval(() => {
     checkPoint = parseFloat(
       document.querySelector('.mastery-pool-xp-progress-15').textContent
     )
-    if (checkPoint < 95.5) {
-      addMasteryXPToPool(skillID, 4046897, false, true)
-      i = i + 1
-      console.log('add pool xp:', Skills[skillID], i, 'times')
-      if (i == count) {
-        clearInterval(checkPool)
-        console.log('add pool xp: finished')
-      }
+    // if (checkPoint < 95.5) {
+    addMasteryXPToPool(skillID, 4046897, false, true)
+    i = i + 1
+    console.log('add pool xp:', Skills[skillID], i, 'times')
+    if (i == count) {
+      clearInterval(checkPool)
+      console.log('add pool xp: finished')
     }
-  }, 1000 * 1)
+    // }
+  }, 1000 * sec)
 }
 ;(function () {
   // * footer

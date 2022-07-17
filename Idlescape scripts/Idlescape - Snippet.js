@@ -117,7 +117,7 @@
       'Guard ', // ruby
       // 'Black Knight ',
       'Infected Naga ', // g/r ore/bar, bracelet
-      // 'Corrupted Tree ', // seeds
+      'Corrupted Tree ', // seeds
       // 'Bone Giant ', // 1h Chorus of Souls, cape
       // 'Moss Giant ', // 2h Moss Maul
       'Fire Giant ', // coal
@@ -140,6 +140,10 @@
     // function rollMonster() {
 
     console.log('target combat zone:', combatZoneList[combatZoneID])
+    setTimeout(() => {
+      document.querySelectorAll('.drawer-item-left')[15].click()
+      console.log('into combat zone')
+    }, 1000 * 10)
     repeat(checkMonster, (sec = 1.8), (count = 2))
     repeat(checkCombatZone, (sec = 0.8), (count = 2), (para = combatZoneID))
 

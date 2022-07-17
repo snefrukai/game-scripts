@@ -5,7 +5,7 @@ window.autoRollMonster = function (combatZoneID = 5) {
     'Guard ', // ruby
     // 'Black Knight ',
     'Infected Naga ', // g/r ore/bar, bracelet
-    // 'Corrupted Tree ', // seeds
+    'Corrupted Tree ', // seeds
     // 'Bone Giant ', // 1h Chorus of Souls, cape
     // 'Moss Giant ', // 2h Moss Maul
     'Fire Giant ', // coal
@@ -28,6 +28,10 @@ window.autoRollMonster = function (combatZoneID = 5) {
   // function rollMonster() {
 
   console.log('target combat zone:', combatZoneList[combatZoneID])
+  setTimeout(() => {
+    document.querySelectorAll('.drawer-item-left')[15].click()
+    console.log('into combat zone')
+  }, 1000 * 10)
   repeat(checkMonster, (sec = 1.8), (count = 2))
   repeat(checkCombatZone, (sec = 0.8), (count = 2), (para = combatZoneID))
 
@@ -118,5 +122,14 @@ window.autoRollMonster = function (combatZoneID = 5) {
   }
 }
 
-var beginAutoRollMonster = setInterval(autoRollMonster, 3000)
+// !only roll once
+// var beginAutoRollMonster = setInterval(
+//   autoRollMonster((combatZoneID = 4)),
+//   3000
+// )
+
+var beginAutoRollMonster = setInterval(function () {
+  autoRollMonster((combatZoneID = 4))
+}, 3000)
+
 // autoRollMonster((combatZoneID = 5)) // ! test

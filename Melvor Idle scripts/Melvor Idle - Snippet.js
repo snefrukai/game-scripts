@@ -97,7 +97,7 @@ window.checkNoGathering = function () {
 }
 
 // * eat to full hp
-window.autoEatToFull_repeat = function (minute = 0.2) {
+window.autoEatToFull_repeat = function (sec = 1) {
   let hp = {
     current: 0,
     max: 1,
@@ -139,21 +139,21 @@ window.autoEatToFull_repeat = function (minute = 0.2) {
     return numb
   }
 
-  function repeat(fn = autoEatToFull, count = 60 * 24, minute = 1) {
+  function repeat(fn = autoEatToFull, count = 60 * 24, sec = 10) {
     let i = 0
     function recur() {
       fn()
       i += 1
-      console.log('auto eat', i, 'times, next check in', minute, 'minute')
+      console.log('auto eat', i, 'times, next check in', sec, 'sec')
       setTimeout(function () {
         if (i < count) {
           recur()
         }
-      }, 1000 * 60 * minute)
+      }, 1000 * sec)
     }
     recur()
   }
-  repeat(autoEatToFull, (count = (60 / minute) * 24), (minute = minute))
+  repeat(autoEatToFull, (count = (3600 / sec) * 24 * 10), (sec = sec))
 }
 
 // * add mastery pool xp to skill after overnight
@@ -182,7 +182,7 @@ window.addPoolXPForCount = function (skillID, count, sec = 30) {
     if (typeof isLoaded !== typeof undefined && isLoaded) {
       clearInterval(scriptLoader)
 
-      autoEquipmentSwap()
+      // autoEquipmentSwap()
       checkNoGathering()
       addPoolXPForCount()
 

@@ -1,4 +1,12 @@
 // ========================================================================== //
+// * equipSkillCape
+
+// skip skill cape if has max cape
+var capeTarget = [Items['Max_Skillcape'], capeID]
+var itemID = capeTarget.filter((e) => doesPlayerOwnItem(e))[0]
+if (itemID == '') return false //  have no cape
+
+// ========================================================================== //
 // * get item's id
 
 const getID = function () {

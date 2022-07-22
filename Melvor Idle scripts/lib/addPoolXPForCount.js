@@ -1,5 +1,4 @@
 // * add mastery pool xp to skill after overnight
-
 window.addPoolXPForCount = function (skillID, count, sec = 30) {
   var i = 0
   var checkPool = setInterval(() => {

@@ -1,6 +1,7 @@
 // * change equipment and buff according to action
 
-window.settingList = [
+window.buffSetting = [
+  // * non-combat
   {
     name: 'non-combat universal',
     equipment: [
@@ -59,7 +60,8 @@ window.settingList = [
     ],
   },
 
-  // ! deep sea ship
+  // * combat
+  // deep sea ship
   {
     name: 'Pirate',
     prayer: [],
@@ -74,7 +76,7 @@ window.settingList = [
     CO: { prayer: ['Chivalry'] },
   },
 
-  // ! spider
+  // spider
   {
     name: 'Spider',
     prayer: [],
@@ -89,7 +91,7 @@ window.settingList = [
     CO: { prayer: ['Chivalry'] },
   },
 
-  // ! Frozen Cove
+  // Frozen Cove
   {
     name: 'Ice Monster',
     prayer: [],
@@ -104,7 +106,7 @@ window.settingList = [
     CO: { prayer: ['Chivalry'] },
   },
 
-  // ! Miolite Caves
+  // Miolite Caves
   {
     name: 'Miolite Sprig',
     prayer: [],
@@ -120,12 +122,56 @@ window.settingList = [
     CO: { prayer: ['Chivalry'] },
   },
 
-  // ! peaks
+  // peaks
   {
     name: 'Greater Skeletal Dragon',
     prayer: ['Battleheart', 'Protect_from_Melee'],
     // prayer: [prayers.Battleheart, prayers.Protect_from_Melee],
     equipment: [],
+  },
+
+  // Dragons Den
+  {
+    name: 'Green Dragon',
+    areaType: 'Dungeon',
+    prayer: [],
+    potion: 'Diamond_Luck_Potion_IV',
+    equipment: [
+      // std
+      'Chapeau_Noir',
+      'Ancient_Wizard_Robes',
+      'Ancient_Wizard_Bottoms',
+      'Sand_Treaders',
+      'Mystic_Water_Staff',
+      'Amulet_of_Magic',
+      'Ring_Of_Wealth',
+      'Elementalist_Gloves',
+      'Wizards_Scroll',
+      'Skull_Cape',
+      'Summoning_Familiar_Witch',
+      'Summoning_Familiar_Dragon',
+    ],
+  },
+
+  // Air God Dungeon
+  {
+    name: 'Air Guard',
+    prayer: [],
+    equipment: [
+      // std
+      'Ancient_Helmet_T_G',
+      'Ancient_Platebody_T_G',
+      'Ancient_Platelegs_T_G',
+      'Dragon_Boots_T_G',
+      'Sunset_Rapier',
+      'Scaled_Shield',
+      'Elite_Amulet_of_Strength',
+      'Ring_Of_Blade_Echoes',
+      'Paladin_Gloves',
+      'Infernal_Cape',
+      'Summoning_Familiar_Minotaur',
+      'Summoning_Familiar_Dragon',
+    ],
   },
 ]
 
@@ -133,7 +179,7 @@ window.autoChangeBuff = function () {
   window.autoChangeBuff = true
   // window.useMaxLvlPrayer = false
   // window.useMaxLvlCurseAndAurora = false
-  const equipmentSetNonCombat = 4 - 1
+  // const equipmentSetNonCombat = 4 - 1
   var activeSkillTemp = ''
 
   addCheckbox(
@@ -171,15 +217,13 @@ window.autoChangeBuff = function () {
     checkboxTarget.checked = window[varStr] // set checked default
   }
 
+  // todo: potion
   function changeBuff() {
     const inCombat = game.activeSkill == 1
     const notIdle = game.activeSkill != 0
-    const hasPassive = dungeonCompleteCount[15] >= 1
     var activeSkillNew = ''
     var setting = ''
     var log = 'settings: '
-    var summonSlotEmp = 'Summon1'
-    var countFamiliar = 0
 
     // get target
     if (inCombat) {
@@ -194,12 +238,12 @@ window.autoChangeBuff = function () {
       activeSkillTemp = activeSkillNew
 
       // alt magic
-      var activeSkillNewSub =
+      var activeSkillNewTemp =
         activeSkillNew == 'Magic'
           ? game.altMagic.selectedSpell.name
           : activeSkillNew
       // e.g. 'Item Alchemy III' includes 'Item Alchemy'
-      setting = settingList.find((e) => activeSkillNewSub.includes(e.name))
+      setting = buffSetting.find((e) => activeSkillNewTemp.includes(e.name))
 
       // check account type
       if (setting != undefined && username && username.includes('CO')) {
@@ -207,109 +251,125 @@ window.autoChangeBuff = function () {
         log = 'CO ' + log
       }
 
-      // change according to settings
+      // change according to eq settings
+      let eqSetting = []
       if (setting != undefined && inCombat) {
-        // swapEquipmentSet() // !
+        // ? check areaType. e.g. black dragon (dragon den)
+        // swapEquipmentSet() // ?
         changePrayer(setting['prayer'])
-        // !equipment
-      } else if (!inCombat) {
-        swapEquipmentSet()
-        let equipments = []
-
+        // ? change equipment
+        // add universal
+      } else if (!inCombat && notIdle) {
         // add skill cape
+        // ! None_Skillcape
         const currentSkillCape = activeSkillNew + '_Skillcape'
-        equipments.push(currentSkillCape)
+        eqSetting.push(currentSkillCape)
 
-        // add universal and setting
-        const universal = settingList.find(
+        // add universal
+        const universal = buffSetting.find(
           (e) => e.name == 'non-combat universal'
         )
-        equipments = equipments.concat(universal.equipment)
-        if (setting != undefined)
-          equipments = equipments.concat(setting.equipment)
-        // console.log(setting, equipments)
+        eqSetting = eqSetting.concat(universal.equipment)
 
-        // clear summon slot, to avoid unwanted synergy
-        // ! 放在外面会出bug
-        // const slotsToClear = [12, 13]
-        // for (i of slotsToClear)
-        //   player.unequipItem(player.selectedEquipmentSet, EquipmentSlots[i])
-
-        // change equipment
-        for (const i of equipments) {
-          console.log(i)
-          const isPassive =
-            typeof i == 'object' && Object.keys(i)[0] == 'passive'
-          const itemID = isPassive ? Items[i.passive] : Items[i]
-          const bankID = getBankId(itemID)
-          const isFamiliar =
-            items[itemID].type != undefined && items[itemID].type == 'Familiar'
-          const ownedAndNotInCurrentSet =
-            doesPlayerOwnItem(itemID) &&
-            !player.equipment.checkForItemID(itemID)
-
-          // if familiar is equiped
-          if (isFamiliar) {
-            const summonSlotUsed = player.equipment.getSlotOfItemID(itemID)
-            const otherSlot = (slot) =>
-              slot === 'Summon1' ? 'Summon2' : 'Summon1'
-            if (summonSlotUsed !== 'None') {
-              summonSlotEmp = otherSlot(summonSlotUsed)
-              console.log(Items[itemID], 'is at', summonSlotUsed)
-            }
-            countFamiliar += 1
-            console.log('countFamiliar', countFamiliar)
-            // ?如果synergy顺序不对,会二次装备。是否有必要继续优化？
-            // ? no need to equip max?
-          }
-
-          // equip
-          if (ownedAndNotInCurrentSet) {
-            fetchItemFromSets(itemID)
-            // afterwhile target item is in bank
-            if (isFamiliar) {
-              player.equipItem(
-                itemID,
-                equipmentSetNonCombat,
-                summonSlotEmp,
-                bank[bankID].qty / 2
-              )
-
-              console.log('equip', Items[itemID], 'at', summonSlotEmp)
-              summonSlotEmp = 'Summon2'
-            } else if (isPassive && hasPassive) {
-              player.equipItem(itemID, equipmentSetNonCombat, 'Passive')
-              console.log('equip passive', Items[itemID])
-            } else {
-              player.equipItem(itemID, equipmentSetNonCombat)
-              console.log('equip', Items[itemID])
-              // player.equipCallback(itemID) // ! could equip in different set
-              // ! 怎样避免max cape和skill cape循环地equip？ 1. target 改变前只执行1次
-            }
-          }
-        }
-
-        // clear summon slot, to avoid unwanted synergy
-        // ! undefined and null, idk why
-        // const itemID = player.equipment.slots.Summon2.item.id
-        // for (const i in player.equipment.slots) {
-        //   if (player.equipment.slots[i].item.id == itemID) {
-        //     player.unequipCallback(i)()
-        // ! why 'unequipCallback' have to use format to work?
-        //     console.log('unequip', Items[itemID])
-        //   }
-        // }
-
-        if (countFamiliar < 2) unequipItem(player.selectedEquipmentSet, 13)
-        if (countFamiliar < 1) unequipItem(player.selectedEquipmentSet, 12)
-
-        // player.unequipItem(player.selectedEquipmentSet, EquipmentSlots[12])
-        // console.log('unequip', player.equipment.slotArray[12].item.id)
+        swapEquipmentSet()
       }
+      // add setting
+      if (setting != undefined) eqSetting = eqSetting.concat(setting.equipment)
+      // console.log(setting, eqSetting)
+      changeEquipment(eqSetting)
 
       log += setting != undefined ? 'loaded' : typeof setting
-      console.log('new skill target:', activeSkillNewSub, ',', log)
+      console.log('new skill target:', activeSkillNewTemp, ',', log)
     }
+  }
+
+  // changeEquipment(['Chapeau Noir'])
+  // changeEquipment(['Chapeau_Noir'])
+  function changeEquipment(eqSetting) {
+    const hasPassive = dungeonCompleteCount[15] >= 1
+    var countFamiliar = 0
+    var summonSlotEmp = 'Summon1'
+
+    if (eqSetting == []) return false
+
+    for (let item of eqSetting) {
+      const isPassive =
+        typeof item == 'object' && Object.keys(item)[0] == 'passive'
+      if (isPassive) item = item.passive
+      const itemID = Items[item.replace(/\s/gm, '_')] // change space to '_'
+      const bankID = getBankId(itemID)
+      const isFamiliar =
+        items[itemID].type != undefined && items[itemID].type == 'Familiar'
+      const ownedAndNotInCurrentSet =
+        doesPlayerOwnItem(itemID) && !player.equipment.checkForItemID(itemID)
+      // console.log('target item:', item)
+
+      // * if familiar is equiped
+      if (isFamiliar) {
+        const summonSlotUsed = player.equipment.getSlotOfItemID(itemID)
+        const otherSlot = (slot) => (slot === 'Summon1' ? 'Summon2' : 'Summon1')
+        if (summonSlotUsed !== 'None') {
+          summonSlotEmp = otherSlot(summonSlotUsed)
+          console.log(Items[itemID], 'is at', summonSlotUsed)
+        }
+        countFamiliar += 1
+        console.log('countFamiliar', countFamiliar)
+        // ?如果synergy顺序不对,会二次装备。是否有必要继续优化？
+        // ? no need to equip max?
+      }
+
+      // * equip
+      if (ownedAndNotInCurrentSet) {
+        fetchItemFromSets(itemID)
+        // console.log('feteched:', itemID)
+        // afterwhile target item is in bank
+        if (isFamiliar) {
+          player.equipItem(
+            itemID,
+            player.selectedEquipmentSet,
+            summonSlotEmp,
+            bank[bankID].qty / 2
+          )
+
+          console.log('equip', Items[itemID], 'at', summonSlotEmp)
+          summonSlotEmp = 'Summon2'
+        } else if (isPassive && hasPassive) {
+          player.equipItem(itemID, player.selectedEquipmentSet, 'Passive')
+          console.log('equip passive', Items[itemID])
+        } else {
+          player.equipItem(itemID, player.selectedEquipmentSet)
+          console.log('equip:', Items[itemID])
+          // player.equipCallback(itemID) // ! could equip in different set
+          // ! 怎样避免max cape和skill cape循环地equip？ 1. target 改变前只执行1次
+        }
+      }
+    }
+
+    // * clear summon slot, to avoid unwanted synergy
+    // ! if in combat, could clear when not wanting to clear
+    if (countFamiliar == 1) {
+      // if only has 1 familiar in setting, clear 2nd summon slot
+      unequipItem(player.selectedEquipmentSet, 13)
+    }
+    // if (countFamiliar < 1) unequipItem(player.selectedEquipmentSet, 12)
+
+    // ! 放在外面会出bug
+    // const slotsToClear = [12, 13]
+    // for (i of slotsToClear)
+    //   player.unequipItem(player.selectedEquipmentSet, EquipmentSlots[i])
+
+    // ! undefined and null, idk why
+    // const itemID = player.equipment.slots.Summon2.item.id
+    // for (const i in player.equipment.slots) {
+    //   if (player.equipment.slots[i].item.id == itemID) {
+    //     player.unequipCallback(i)()
+    // ! why 'unequipCallback' have to use format to work?
+    //     console.log('unequip', Items[itemID])
+    //   }
+    // }
+
+    // player.unequipItem(player.selectedEquipmentSet, EquipmentSlots[12])
+    // console.log('unequip', player.equipment.slotArray[12].item.id)
   }
 
   function fetchItemFromSets(itemID) {
@@ -390,6 +450,7 @@ window.autoChangeBuff = function () {
   }
 
   function swapEquipmentSet() {
+    const equipmentSetNonCombat = 4 - 1
     const playerAttackTypes = getPlayerAttackTypes(equipmentSetNonCombat)
     var setTarget = null
 
@@ -437,8 +498,8 @@ window.autoChangeBuff = function () {
       return playerAttackTypes.findIndex((e) => e == setTarget)
     }
 
-    // getPlayerAttackTypes() // ! test
-    function getPlayerAttackTypes(equipmentSetNonCombat = 3) {
+    // getPlayerAttackTypes(equipmentSetNonCombat) // ! test
+    function getPlayerAttackTypes(equipmentSetNonCombat) {
       var arr = []
       for (let i = 0; i < player.equipmentSets.length; i++) {
         if (i == equipmentSetNonCombat) continue
@@ -472,16 +533,6 @@ window.autoChangeBuff = function () {
 }
 
 autoChangeBuff() // ! test
-
-// getCurrentGears()  // ! test
-// function getCurrentGears(params) {
-//   var arr = []
-//   player.equipment.slotArray.forEach((e) => {
-//     const itemID = e.item.id
-//     arr.push(Items[itemID])
-//   })
-//   console.log('currentGears', arr)
-// }
 
 // ========================================================================== //
 

@@ -173,7 +173,337 @@ window.addPoolXPForCount = function (skillID, count, sec = 30) {
   }, 1000 * sec)
 }
 
-// * start skill (folked from Action Queue)
+// * get current gears
+// getCurrentGears(3) // ! test
+window.getCurrentGears = function (iSet = player.selectedEquipmentSet) {
+function getCurrentGears(iSet = player.selectedEquipmentSet) {
+  var arr = []
+  player.equipmentSets[iSet].slotArray.forEach((e) => {
+    const s = ActiveSkills[game.activeSkill].toLowerCase()
+    activeSkillNew = s[0].toUpperCase() + s.slice(1)
+    const itemID = e.item.id
+    const item = Items[itemID]
+    const nonCombatUniversal = [
+      'Crown_of_Rhaelyx',
+      'Clue_Chasers_Insignia',
+      'Aorpheats_Signet_Ring',
+      'Ring_Of_Wealth',
+      'Max_Skillcape',
+      'Ancient_Ring_Of_Mastery', // passive
+    ].includes(item)
+
+    // console.log(itemID, item, nonCombatUniversal)
+    if (itemID != -1 && !nonCombatUniversal) {
+      arr.push(Items[itemID])
+    }
+  })
+  console.log(`${activeSkillNew}\ncurrentGears:`, arr)
+}
+
+// ========================================================================== //
+// * folked from Action Queue
+window.actionQueue = function (params) {
+  // setAction('Build Agility Obstacle', 1, 'Cargo Net')()
+  window.setAction = function (
+    actionCategory,
+    actionName,
+    skillItem,
+    skillItem2,
+    qty
+  ) {
+    qty = parseInt(qty, 10)
+    const itemID = items.findIndex((a) => a.name == actionName)
+    switch (actionCategory) {
+      case 'Start Skill':
+        return setSkillAction(actionName, skillItem, skillItem2)
+      case 'Start Combat': {
+        //slayer task selection
+        if (actionName == 'Slayer Task') {
+          return () => {
+            if (combatManager.slayerTask.killsLeft > 0) {
+              const mID = combatManager.slayerTask.monster.id
+              const areaData = [
+                ...areaMenus.combat.areas,
+                ...areaMenus.slayer.areas,
+              ].find((a) => a.monsters.includes(mID))
+              if (
+                combatManager.isInCombat &&
+                combatManager.selectedMonster == mID
+              )
+                return true
+              combatManager.stopCombat()
+              combatManager.selectMonster(mID, areaData)
+              return true
+            }
+            return false
+          }
+        }
+        //dungeon selection
+        const dungeonIndex = DUNGEONS.findIndex((a) => a.name == actionName)
+        if (dungeonIndex >= 0) {
+          return () => {
+            if (
+              DUNGEONS[dungeonIndex].requiresCompletion === undefined ||
+              dungeonCompleteCount[DUNGEONS[dungeonIndex].requiresCompletion] >=
+                1
+            ) {
+              combatManager.selectDungeon(dungeonIndex)
+              return true
+            }
+            return false
+          }
+        }
+        //regular monster selection
+        const monsterIndex = MONSTERS.findIndex((a) => a.name == actionName)
+        const areaData = [
+          ...areaMenus.combat.areas,
+          ...areaMenus.slayer.areas,
+        ].find((a) => a.monsters.includes(monsterIndex))
+        return () => {
+          if (checkRequirements(areaData.entryRequirements)) {
+            if (
+              !(
+                combatManager.isInCombat &&
+                combatManager.selectedMonster == monsterIndex
+              )
+            )
+              combatManager.selectMonster(monsterIndex, areaData)
+            return true
+          }
+          return false
+        }
+      }
+      case 'Change Attack Style': {
+        if (actionName == 'Select Spell') {
+          switch (skillItem) {
+            case 'Normal':
+              return () => {
+                const spellID = SPELLS.findIndex((a) => a.name == skillItem2)
+                //check level req
+                if (
+                  skillLevel[CONSTANTS.skill.Magic] <
+                  SPELLS[spellID].magicLevelRequired
+                )
+                  return false
+                player.toggleSpell(spellID)
+                return true
+              }
+            case 'Curse':
+              return () => {
+                const spellID = CURSES.findIndex((a) => a.name == skillItem2)
+                //check level req
+                if (
+                  skillLevel[CONSTANTS.skill.Magic] <
+                  CURSES[spellID].magicLevelRequired
+                )
+                  return false
+                player.toggleCurse(spellID)
+                return true
+              }
+            case 'Aurora':
+              return () => {
+                const spellID = AURORAS.findIndex((a) => a.name == skillItem2)
+                //check level req
+                if (
+                  skillLevel[CONSTANTS.skill.Magic] <
+                  AURORAS[spellID].magicLevelRequired
+                )
+                  return false
+                //check item req
+                if (
+                  AURORAS[spellID].requiredItem >= 0 &&
+                  !player.equipment.slotArray
+                    .map((a) => a.item.id)
+                    .includes(AURORAS[spellID].requiredItem)
+                )
+                  return false
+                player.toggleAurora(spellID)
+                return true
+              }
+            case 'Ancient':
+              return () => {
+                const spellID = ANCIENT.findIndex((a) => a.name == skillItem2)
+                //check level req
+                if (
+                  skillLevel[CONSTANTS.skill.Magic] <
+                  ANCIENT[spellID].magicLevelRequired
+                )
+                  return false
+                //check dungeon req
+                if (
+                  dungeonCompleteCount[
+                    ANCIENT[spellID].requiredDungeonCompletion[0]
+                  ] < ANCIENT[spellID].requiredDungeonCompletion[1]
+                )
+                  return false
+                player.toggleSpellAncient(spellID)
+                return true
+              }
+          }
+        }
+        const style = CONSTANTS.attackStyle[actionName]
+        return () => {
+          if (player.attackType == 'magic') {
+            if (style < 6) return false
+          } else if (player.attackType === 'ranged') {
+            if (style > 5 || style < 3) return false
+          } else {
+            if (style > 2) return false
+          }
+          player.setAttackStyle(player.attackType, actionName)
+          return true
+        }
+      }
+      case 'Switch Equipment Set': {
+        const equipSet = parseInt(actionName) - 1
+        return () => {
+          if (player.equipmentSets.length > equipSet) {
+            player.changeEquipmentSet(equipSet)
+            return true
+          }
+          return false
+        }
+      }
+      case 'Equip Item':
+        return () => {
+          const bankID = getBankId(itemID)
+          if (bankID === -1) return false
+          if (sellItemMode) toggleSellItemMode()
+          if (items[itemID].canEat) {
+            selectBankItem(itemID)
+            equipFoodQty = bank[bankID].qty
+            equipFood()
+            return getBankQty(itemID) == 0 //returns false if there is any of the item left in bank (couldn't equip)
+          }
+          if (items[itemID].type == 'Familiar') {
+            let slot = player.equipment.slotArray
+              .slice(-3)
+              .findIndex((a) => a.item.id == itemID)
+            if (slot >= 0) {
+              player.equipItem(
+                itemID,
+                player.selectedEquipmentSet,
+                `Summon${slot}`,
+                bank[bankID].qty
+              )
+            } else if (player.equipment.slotArray[12].quantity == 0) {
+              player.equipItem(
+                itemID,
+                player.selectedEquipmentSet,
+                'Summon1',
+                bank[bankID].qty
+              )
+            } else if (player.equipment.slotArray[13].quantity == 0) {
+              player.equipItem(
+                itemID,
+                player.selectedEquipmentSet,
+                'Summon2',
+                bank[bankID].qty
+              )
+            }
+            return getBankQty(itemID) == 0
+          }
+          if (items[itemID].validSlots[0] == 'Quiver') {
+            player.equipItem(
+              itemID,
+              player.selectedEquipmentSet,
+              'Quiver',
+              bank[bankID].qty
+            )
+            return getBankQty(itemID) == 0 //returns false if there is any of the item left in bank (couldn't equip)
+          }
+          player.equipItem(itemID, player.selectedEquipmentSet)
+          return (
+            player.equipment.slots[items[itemID].validSlots[0]].item.id ===
+            itemID
+          ) //returns false if the item is not equipped
+        }
+      case 'Equip Passive':
+        return () => {
+          if (dungeonCompleteCount[15] < 1 || getBankId(itemID) === -1)
+            return false
+          player.equipCallback(itemID, 'Passive')
+          return player.equipment.slots.Passive.item.id === itemID
+        }
+      case 'Unequip Item': {
+        return () => {
+          for (const i in player.equipment.slots) {
+            if (player.equipment.slots[i].item.id == itemID) {
+              player.unequipCallback(i)()
+              return getBankQty(itemID) > 0 //returns false if there is 0 of the items in bank (no space to unequip)
+            }
+          }
+          return false
+        }
+      }
+      case 'Buy Item':
+        return () => {
+          return shop[actionName].buy(qty)
+        }
+      case 'Sell Item':
+        return () => {
+          if (!bank.find((a) => a.id == itemID)) return false
+          if (sellItemMode) toggleSellItemMode()
+          selectBankItem(itemID)
+          sellItem()
+          if (showSaleNotifications) swal.clickConfirm()
+          return true
+        }
+      case 'Use Potion':
+        return () => {
+          if (!bank.find((a) => a.id == itemID)) return false
+          usePotion(itemID)
+          return true
+        }
+      case 'Activate Prayers': {
+        let choice = []
+        if (actionName != 'None') {
+          choice.push(PRAYER.findIndex((a) => a.name == actionName))
+          if (skillItem != 'None') {
+            choice.push(PRAYER.findIndex((a) => a.name == skillItem))
+          }
+        }
+        return () => {
+          const validPrayers = choice.filter(
+            (a) => skillLevel[CONSTANTS.skill.Prayer] > PRAYER[a].prayerLevel
+          )
+          changePrayers(validPrayers)
+          return true
+        }
+      }
+      case 'Build Agility Obstacle': {
+        const obstacleID = Agility.obstacles.findIndex(
+          (a) => a.name == skillItem
+        )
+        const obstacleNumber = parseInt(actionName) - 1
+        return () => {
+          if (chosenAgilityObstacles[obstacleNumber] == obstacleID) return true
+          if (
+            !canIAffordThis(
+              Agility.obstacles[obstacleID].cost,
+              Agility.obstacles[obstacleID].skillRequirements,
+              obstacleID
+            )
+          )
+            return false
+          if (chosenAgilityObstacles[obstacleNumber] >= 0)
+            destroyAgilityObstacle(obstacleNumber, true)
+          buildAgilityObstacle(obstacleID, true)
+          return true
+        }
+      }
+      case 'Remove Agility Obstacle': {
+        const obstacleNumber = parseInt(actionName) - 1
+        return () => {
+          if (chosenAgilityObstacles[obstacleNumber] >= 0)
+            destroyAgilityObstacle(obstacleNumber, true)
+          return true
+        }
+      }
+    }
+  }
+}
+// * start skill
 // call
 // start: setAction(actionCategory, actionName, skillItem, skillItem2, qty)
 // result = action.start()
@@ -495,16 +825,15 @@ window.setSkillAction = function (actionName, skillItem1, skillItem2) {
 
 // ========================================================================== //
 // * footer
+// ========================================================================== //
 ;(function () {
   function loadScript() {
     // Load script after the actual Melvor game has loaded
     if (typeof isLoaded !== typeof undefined && isLoaded) {
       clearInterval(scriptLoader)
 
-      // autoEquipmentSwap()
+      // call function
       checkNoGathering()
-      addPoolXPForCount()
-      setSkillAction()
 
       const scriptElem = document.createElement('script')
       scriptElem.textContent = `try {(${startSnippets})();} catch (e) {console.log(e);}`

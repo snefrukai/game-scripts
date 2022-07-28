@@ -22,6 +22,17 @@ window.buffSetting = [
     ],
   },
   {
+    name: 'Fishing',
+    equipment: [
+      'Sailors_Top',
+      'Amulet_of_Fishing',
+      'Fishing_Hook',
+      'Summoning_Familiar_Pig',
+      'Summoning_Familiar_Octopus',
+      { passive: 'Ancient_Ring_Of_Mastery' },
+    ],
+  },
+  {
     name: 'Thieving',
     equipment: [
       'Chapeau_Noir',
@@ -61,6 +72,13 @@ window.buffSetting = [
   },
 
   // * combat
+  {
+    name: 'combat universal',
+    equipment: [
+      'Fury_of_the_Elemental_Zodiacs', //
+    ],
+  },
+
   // deep sea ship
   {
     name: 'Pirate',
@@ -171,9 +189,29 @@ window.buffSetting = [
       'Infernal_Cape',
       'Summoning_Familiar_Minotaur',
       'Summoning_Familiar_Dragon',
+      // extra
+      'Ancient_D-hide_Vambraces',
     ],
   },
 ]
+waterGod = {
+  equipment: [
+    713,
+    715,
+    714,
+    716,
+    696,
+    1143,
+    756,
+    1086,
+    753,
+    685,
+    941,
+    -1,
+    984,
+    985, //
+  ], //
+}
 
 window.autoChangeBuff = function () {
   window.autoChangeBuff = true
@@ -218,6 +256,7 @@ window.autoChangeBuff = function () {
   }
 
   // todo: potion
+  // todo: universal should come after specific settings
   function changeBuff() {
     const inCombat = game.activeSkill == 1
     const notIdle = game.activeSkill != 0
@@ -283,6 +322,7 @@ window.autoChangeBuff = function () {
     }
   }
 
+  // todo: accept parameter in number
   // changeEquipment(['Chapeau Noir'])
   // changeEquipment(['Chapeau_Noir'])
   function changeEquipment(eqSetting) {

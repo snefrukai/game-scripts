@@ -10,6 +10,30 @@ window.agilitySetting = [
     //   [4, 'Rooftop Run'],
     // ],
   },
+  {
+    name: 'crafting',
+    obstacle: {
+      3: 'Cave Climb',
+      5: 'Lake Swim',
+      6: 'Boulder Trap',
+      7: 'Spike Jump',
+      8: 'Ice Jump',
+      11: 'Pillar of Combat',
+    },
+  },
+  {
+    name: 'combat',
+    obstacle: {
+      2: 'Pipe Balance',
+      3: 'Coal Stones',
+      5: 'Tree Hop',
+      6: 'Heat Trap',
+      7: 'Tree Hang',
+      8: 'Ice Jump',
+      9: 'Boulder Move',
+      11: 'Pillar of Combat',
+    },
+  },
 ]
 
 window.autoChangeObstacle = function (skillTarget) {

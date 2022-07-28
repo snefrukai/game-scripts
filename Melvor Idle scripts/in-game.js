@@ -58,3 +58,27 @@ function unlockSkill(skill) {
     if (skill === Skills.Astrology) game.astrology.onSkillUnlock()
   }
 }
+
+// ========================================================================== //
+//
+
+// Items['Diamond_Luck_Potion_IV'] 636
+usePotion(636)
+function usePotion(itemID, isOffline = false, potionSelection = false) {
+  const bankID = getBankId(itemID)
+  if (bankID >= 0) {
+    updateHerbloreBonuses(itemID, 0, true, isOffline)
+    updateItemInBank(bankID, itemID, -1, false, isOffline)
+  }
+  if (potionSelection) loadPotions()
+}
+
+function loadPotions() {
+  createPotionSelect()
+  if (SETTINGS.general.autoReusePotion.includes(currentPage))
+    $('.settings-toggle-43').prop('checked', true)
+  else $('.settings-toggle-43').prop('checked', false)
+}
+
+// ========================================================================== //
+//

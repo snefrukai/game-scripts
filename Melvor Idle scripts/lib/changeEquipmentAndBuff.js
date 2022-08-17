@@ -191,27 +191,31 @@ window.buffSetting = [
       'Summoning_Familiar_Dragon',
       // extra
       'Ancient_D-hide_Vambraces',
+      // DL potion
     ],
   },
 ]
-waterGod = {
-  equipment: [
-    713,
-    715,
-    714,
-    716,
-    696,
-    1143,
-    756,
-    1086,
-    753,
-    685,
-    941,
-    -1,
-    984,
-    985, //
-  ], //
-}
+// waterGod = {
+//   equipment: [
+//     713,
+//     715,
+//     714,
+//     716,
+//     696,
+//     1143,
+//     756,
+//     1086,
+//     753,
+//     685,
+//     941,
+//     -1,
+//     984,
+//     985,
+// //  extra
+// fury
+// dragon
+//   ], //
+// }
 
 window.autoChangeBuff = function () {
   window.autoChangeBuff = true
@@ -575,6 +579,30 @@ window.autoChangeBuff = function () {
 autoChangeBuff() // ! test
 
 // ========================================================================== //
+
+changeIDToName(
+  (arr = [
+    713,
+    715,
+    714,
+    716,
+    696,
+    1143,
+    756,
+    1086,
+    753,
+    685,
+    941,
+    -1,
+    984,
+    985, //
+  ])
+)
+function changeIDToName(arr) {
+  arr.forEach((e) => {
+    console.log(Items[e])
+  })
+}
 
 // * equipment slot order
 // [helm,body,leg,boot,weapon,shield,amulet, ring, glove, quiver, cape,passive ,s1,s2]
